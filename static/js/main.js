@@ -47,8 +47,12 @@ function loadVideoInfo() {
   document.getElementById("kt_player").src = "https://www.xvideos.com/embedframe/" + videoId;
 }
 
+function loadPhotos(){
+
+}
+
 function loadPage(tipo, newPage = 0, query = "") {
-  document.getElementById("videoList").innerHTML = "<h2>Loading...</h2>";
+  document.getElementById("videoList").innerHTML = "<br><div class=\"loader\"></div>";
   tipoAtual = tipo;
   if (newPage < 0)
     newPage = (new URLSearchParams(window.location.search).get('pagina') || null);

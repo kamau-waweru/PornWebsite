@@ -285,7 +285,7 @@
                                             </a>
                                         </li>
                                         <li class="navigation__item">
-                                            <a href="/fotos.html" class="navigation__link">
+                                            <a href="/fotos.html" class="navigation__link is-active">
                                                 <span class="navigation__icon">
                                                     <svg class="icon icon--photo">
                                                         <use xlink:href="#photo"></use>
@@ -295,7 +295,7 @@
                                             </a>
                                         </li>
                                         <li class="navigation__item">
-                                            <a href="/categorias.html" class="navigation__link is-active">
+                                            <a href="/categorias.html" class="navigation__link">
                                                 <span class="navigation__icon">
                                                     <svg class="icon icon--table">
                                                         <use xlink:href="#table"></use>
@@ -336,17 +336,7 @@
             <div class="g-block">
                 <div class="g-container">
                     <div id="list_categories_categories_list" class="cards">
-                        <div class="heading">
-                            <div class="heading__item">
-                                <div class="heading__icon">
-                                    <svg class="icon icon--heading">
-                                        <use xlink:href="#heading"></use>
-                                    </svg>
-                                </div>
-                                <h1 class="heading__title"> Categorias Disponíveis </h1>
-                            </div>
-                        </div>
-
+                      
                         <div class="cards__list" id="list_categories_categories_list_items">
                             <div class="cards__item cards__item--small js-item">
                                 <a href="/?tipo=amador" class="card card--primary" title="Categoria">
@@ -1054,6 +1044,7 @@
     </div>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="/static/js/main.js"></script>
+    <script>loadPhotos();</script>
 </body>
 
 </html>

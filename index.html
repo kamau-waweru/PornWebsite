@@ -269,13 +269,6 @@
                                     Os melhores <span>vídeos</span>!
                                 </p>
                             </div>
-                            <div class="mobile-btn mobile-btn--user">
-                                <button type="button" class="btn btn--dark btn--icon js-open-user">
-                                    <svg class="icon icon--people">
-                                        <use xlink:href="#people"></use>
-                                    </svg>
-                                </button>
-                            </div>
                         </div>
                         <div class="header__wrap">
                             <div class="header__navigation">
@@ -339,45 +332,53 @@
         </header>
         <!--end header-->
         <!--main-->
+
         <main class="page__main bg-main">
-
-
-
             <div class="g-block">
                 <div class="g-container">
                     <div id="list_videos_popular_today_videos" class="cards">
                         <div class="cards__list" id="videoList">
-                            <h2>Loading...</h2>
-                        </div>
-
-                        <div class="pagination">
-                            <ul class="pagination__list" id="list_videos_popular_today_videos_pagination">
-                                <li class="pagination__item pagination__item--prev pagination__item--mobile">
-                                    <a onclick="returnPage()"
-                                        class="pagination__link" id="botaovoltar">
-                                        <span class="pagination__icon">
-                                            <svg class="icon icon--arrow-left">
-                                                <use xlink:href="#arrow-left"></use>
-                                            </svg>
-                                        </span>
-                                    </a>
-                                </li>
-
-                                <li class="pagination__item pagination__item--next pagination__item--mobile">
-                                    <a onclick="nextPage()" class="pagination__link">
-                                        <span class="pagination__icon">
-                                            <svg class="icon icon--arrow-right">
-                                                <use xlink:href="#arrow-right"></use>
-                                            </svg>
-                                        </span>
-                                    </a>
-                                </li>
-                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
+
+        <style>
+            .phbbottom {
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                text-align: center;
+            }
+        </style>
+
+        <div class="phbbottom">
+            <div class="pagination" style="padding-top: 10px;padding-bottom: 20px;">
+                <ul class="pagination__list" id="list_videos_popular_today_videos_pagination">
+                    <li class="pagination__item pagination__item--prev pagination__item--mobile">
+                        <a onclick="returnPage()" class="pagination__link" id="botaovoltar">
+                            <span class="pagination__icon">
+                                <svg class="icon icon--arrow-left">
+                                    <use xlink:href="#arrow-left"></use>
+                                </svg>
+                            </span>
+                        </a>
+                    </li>
+
+                    <li class="pagination__item pagination__item--next pagination__item--mobile">
+                        <a onclick="nextPage()" class="pagination__link">
+                            <span class="pagination__icon">
+                                <svg class="icon icon--arrow-right">
+                                    <use xlink:href="#arrow-right"></use>
+                                </svg>
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
     </div>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="/static/js/main.js"></script>
