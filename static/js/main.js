@@ -20,8 +20,13 @@ function returnPage() {
 }
 
 function phb() {
+  query = (new URLSearchParams(window.location.search).get('q') || null);
   tipo = (new URLSearchParams(window.location.search).get('tipo') || "portugues");
-  loadPage(tipo);
+  if(query != null){
+    loadPage("search", 0, query);
+  } else {
+    loadPage(tipo);
+  }
 }
 
 function loadVideoInfo() {
@@ -42,13 +47,13 @@ function loadVideoInfo() {
   document.getElementById("kt_player").src = "https://www.xvideos.com/embedframe/" + videoId;
 }
 
-function loadPage(tipo, newPage = 0) {
+function loadPage(tipo, newPage = 0, query = "") {
   document.getElementById("videoList").innerHTML = "<h2>Loading...</h2>";
   tipoAtual = tipo;
   if (newPage == 0)
     newPage = (new URLSearchParams(window.location.search).get('pagina') || 1);
-  window.history.pushState('', 'New Page Title', '?tipo=' + tipo + '&pagina=' + newPage);
-  $.getJSON('/api/?tipo=' + tipo + '&pagina=' + newPage, function (data) {
+  window.history.pushState('', 'New Page Title', '?query='+query+'&tipo=' + tipo + '&pagina=' + newPage);
+  $.getJSON('/api/?query='+query+'&tipo=' + tipo + '&pagina=' + newPage, function (data) {
     document.getElementById("videoList").innerHTML = "";
     for (var video in data) {
       document.getElementById("videoList").innerHTML = document.getElementById("videoList").innerHTML + "<div class=\"cards__item js-item\"><a style=\"cursor:pointer\" onclick=\"location.href='video.html?id=" + data[video].videoId + "&t=" + data[video].title + "&v=" + data[video].views + "&d=" + data[video].duration + "'\" class=\"card js-link\"" +
@@ -62,7 +67,7 @@ function loadPage(tipo, newPage = 0) {
         "        src=\"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\"" +
         "        data-src=\"" + data[video].thumbnail + "\"" +
         "        data-webp=\"" + data[video].thumbnail + "\"" +
-        "        alt=\"Gagged chick with round bottom is enjoying spanking so much\"" +
+        "        alt=\"" + data[video].title + "\"" +
         "        width=\"320\" height=\"180\" />" +
         "</span>" +
         "<span class=\"card__footer\">" +
