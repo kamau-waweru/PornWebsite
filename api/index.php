@@ -1,6 +1,8 @@
 <?php
 header('Content-Type: application/json');
 
+$cache = false;
+
 if(!isset($_GET['tipo']))
     die(json_encode(array("error" => "API missing \"tipo\"!")));
 
@@ -32,12 +34,14 @@ if(isset($_GET['pagina'])){
     $url = $url."/".$pagina;
 }
 
+if($cache){
 @mkdir("cache");
 
 $hash_cache = md5(date("d-m-y").$url);
 
 if(file_exists("cache/".$hash_cache.".cache")){
     die(file_get_contents("cache/".$hash_cache.".cache"));
+}
 }
 
 $array = array();
@@ -112,10 +116,10 @@ foreach($out[0] as $item){
 
 $output = json_encode($array, JSON_PRETTY_PRINT);
 
+if($cache){
 $fp = fopen("cache/".$hash_cache.".cache", "w");
 fwrite($fp, $output);
 fclose($fp);
+}
 
 echo $output;
-
-?>
