@@ -52,7 +52,7 @@ function loadPhotos(){
 }
 
 function loadPage(tipo, newPage = 0, query = "") {
-  document.getElementById("videoList").innerHTML = "<br><div class=\"loader\"></div>";
+  document.getElementById("videoList").innerHTML = "<div class=\"loader\"></div>";
   tipoAtual = tipo;
   if (newPage < 0)
     newPage = (new URLSearchParams(window.location.search).get('pagina') || null);

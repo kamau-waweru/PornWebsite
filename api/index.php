@@ -130,8 +130,7 @@ foreach ($out[0] as $item) {
         "preview" => $linkPreview,
         "path" => $pathVideo,
         "channel" => $canal,
-        "views" => $visualizacoes,
-        "url" => $url
+        "views" => $visualizacoes
     );
     array_push($array, $video);
 }
