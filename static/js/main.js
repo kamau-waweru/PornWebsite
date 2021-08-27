@@ -4,7 +4,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var paginaAtual = 1;
+var paginaAtual = 0;
 var tipoAtual;
 
 function nextPage() {
@@ -13,16 +13,16 @@ function nextPage() {
 }
 
 function returnPage() {
-  newPage = paginaAtual - 1;
-  if (newPage < 1)
-    newPage = 1;
-  loadPage(tipoAtual, newPage);
+  paginaAtual--;
+  if (paginaAtual < 0)
+    paginaAtual = 0;
+  loadPage(tipoAtual, paginaAtual);
 }
 
 function phb() {
   query = (new URLSearchParams(window.location.search).get('q') || null);
   tipo = (new URLSearchParams(window.location.search).get('tipo') || "portugues");
-  if(query != null){
+  if (query != null) {
     loadPage("search", 0, query);
   } else {
     loadPage(tipo);
@@ -38,7 +38,7 @@ function loadVideoInfo() {
   if (videoId == null || titulo == null)
     location.href = "/index.html";
 
-  document.title = titulo+" - PHBPorn";
+  document.title = titulo + " - PHBPorn";
   document.getElementById("videoTitulo").innerText = titulo;
   document.getElementById("duracao").innerText = duracao;
   document.getElementById("visualizacoes").innerText = views;
@@ -50,10 +50,23 @@ function loadVideoInfo() {
 function loadPage(tipo, newPage = 0, query = "") {
   document.getElementById("videoList").innerHTML = "<h2>Loading...</h2>";
   tipoAtual = tipo;
-  if (newPage == 0)
-    newPage = (new URLSearchParams(window.location.search).get('pagina') || 1);
-  window.history.pushState('', 'New Page Title', '?query='+query+'&tipo=' + tipo + '&pagina=' + newPage);
-  $.getJSON('/api/?query='+query+'&tipo=' + tipo + '&pagina=' + newPage, function (data) {
+  if (newPage < 0)
+    newPage = (new URLSearchParams(window.location.search).get('pagina') || null);
+
+  newUrl = "?";
+  if (newPage != null && newPage > 0)
+    newUrl += "pagina=" + newPage + "&";
+  if (query != "")
+    newUrl += "query=" + query + "&";
+  newUrl += "tipo=" + tipo;
+  window.history.pushState('', '', newUrl);
+
+  if (newPage < 1)
+    document.getElementById("botaovoltar").classList.add("is-disabled");
+  else
+    document.getElementById("botaovoltar").classList.remove("is-disabled");
+
+  $.getJSON('/api/?query=' + query + '&tipo=' + tipo + '&pagina=' + newPage, function (data) {
     document.getElementById("videoList").innerHTML = "";
     for (var video in data) {
       document.getElementById("videoList").innerHTML = document.getElementById("videoList").innerHTML + "<div class=\"cards__item js-item\"><a style=\"cursor:pointer\" onclick=\"location.href='video.html?id=" + data[video].videoId + "&t=" + data[video].title + "&v=" + data[video].views + "&d=" + data[video].duration + "'\" class=\"card js-link\"" +
