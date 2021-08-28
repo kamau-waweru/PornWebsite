@@ -48,11 +48,12 @@ function returnPage() {
   else
     insertVideos(pagina[paginaAtual]);
 
-  if ((parseInt(paginaAtual) - 1) > -1) {
-    $.getJSON(`/api/?query=${query}&tipo=${tipo}&pagina=${parseInt(paginaAtual) - 1}`, function (data) {
-      pagina[parseInt(paginaAtual) - 1] = data;
-    });
-  }
+  if (pagina[(parseInt(paginaAtual) - 1)] == null)
+    if ((parseInt(paginaAtual) - 1) > -1) {
+      $.getJSON(`/api/?query=${query}&tipo=${tipo}&pagina=${parseInt(paginaAtual) - 1}`, function (data) {
+        pagina[parseInt(paginaAtual) - 1] = data;
+      });
+    }
 
   updateBotaoVoltar();
   updateUrl();
@@ -87,7 +88,6 @@ function loadVideoInfo() {
 }
 
 function loadPage(tipo, newPage = 0, query = "") {
-  console.log("Load page...");
   document.getElementById("videoList").innerHTML = "<div class=\"loader\"></div>";
   $.getJSON(`/api/?query=${query}&tipo=${tipo}&pagina=${newPage}`, function (data) {
     insertVideos(data);
