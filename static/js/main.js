@@ -5,21 +5,54 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var paginaAtual = 0;
-var tipoAtual;
+var tipoAtual = "portugues";
+var query = null;
+
+var pagina = [];
 
 function nextPage() {
-  loadPage(tipoAtual, paginaAtual + 1);
-  paginaAtual = paginaAtual + 1;
+
+  paginaAtual++;
+
+  if (pagina[paginaAtual] != null) {
+    insertVideos(pagina[paginaAtual]);
+    if (pagina[(paginaAtual + 1)] == null) {
+      $.getJSON('/api/?query=' + query + '&tipo=' + tipo + '&pagina=' + (paginaAtual + 1), function (data) {
+        pagina[(paginaAtual + 1)] = data;
+      });
+    }
+  } else {
+    loadPage(tipoAtual, paginaAtual);
+  }
+
+  updateBotaoVoltar();
+  updateUrl();
+}
+
+function updateBotaoVoltar() {
+  if (paginaAtual < 1)
+    document.getElementById("botaovoltar").classList.add("is-disabled");
+  else
+    document.getElementById("botaovoltar").classList.remove("is-disabled");
 }
 
 function returnPage() {
+
   paginaAtual--;
+
   if (paginaAtual < 0)
     paginaAtual = 0;
-  loadPage(tipoAtual, paginaAtual);
+
+  if (pagina[paginaAtual] == null)
+    loadPage(tipoAtual, paginaAtual);
+  else
+    insertVideos(pagina[paginaAtual]);
+
+  updateBotaoVoltar();
+  updateUrl();
 }
 
-function phb() {
+function loadVideosPage() {
   query = (new URLSearchParams(window.location.search).get('q') || null);
   tipo = (new URLSearchParams(window.location.search).get('tipo') || "portugues");
   if (query != null) {
@@ -47,7 +80,7 @@ function loadVideoInfo() {
   document.getElementById("kt_player").src = "https://www.xvideos.com/embedframe/" + videoId;
 }
 
-function loadPhotos(){
+function loadPhotos() {
 
 }
 
@@ -57,62 +90,82 @@ function loadPage(tipo, newPage = 0, query = "") {
   if (newPage < 0)
     newPage = (new URLSearchParams(window.location.search).get('pagina') || null);
 
-  newUrl = "?";
-  if (newPage != null && newPage > 0)
-    newUrl += "pagina=" + newPage + "&";
-  if (query != "")
-    newUrl += "query=" + query + "&";
-  newUrl += "tipo=" + tipo;
-  window.history.pushState('', '', newUrl);
-
   if (newPage < 1)
     document.getElementById("botaovoltar").classList.add("is-disabled");
   else
     document.getElementById("botaovoltar").classList.remove("is-disabled");
 
   $.getJSON('/api/?query=' + query + '&tipo=' + tipo + '&pagina=' + newPage, function (data) {
-    document.getElementById("videoList").innerHTML = "";
-    for (var video in data) {
-      document.getElementById("videoList").innerHTML = document.getElementById("videoList").innerHTML + "<div class=\"cards__item js-item\"><a style=\"cursor:pointer\" onclick=\"location.href='video.html?id=" + data[video].videoId + "&t=" + data[video].title + "&v=" + data[video].views + "&d=" + data[video].duration + "'\" class=\"card js-link\"" +
-        "data-rt=\"25:831c7c7716c2633c91917029aa159d0d:0:13259:1:\">" +
-        "<span class=\"card__content\"" +
-        "    data-preview=\"" + data[video].preview + "\">" +
-        "    <span class=\"flag-group\">" +
-        "        <span class=\"flag\">" + data[video].duration + "</span>" +
-        "    </span>" +
-        "    <img class=\"card__img lazyload\"" +
-        "        src=\"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\"" +
-        "        data-src=\"" + data[video].thumbnail + "\"" +
-        "        data-webp=\"" + data[video].thumbnail + "\"" +
-        "        alt=\"" + data[video].title + "\"" +
-        "        width=\"320\" height=\"180\" />" +
-        "</span>" +
-        "<span class=\"card__footer\">" +
-        "    <span class=\"card__title\"" +
-        "        title=\"" + data[video].title + "\">" + data[video].title + "</span>" +
-        "    <span class=\"card__action\">" +
-        "        <span class=\"card__col\">" +
-        "            <span class=\"card__col\">" +
-        "                <span class=\"card__icon\">" +
-        "                    <svg class=\"icon icon--eye\">" +
-        "                        <use xlink:href=\"#eye\"></use>" +
-        "                    </svg>" +
-        "                </span>" +
-        "                <span class=\"card__text\">" + data[video].views + "</span>" +
-        "            </span>" +
-        "            <span class=\"card__col\">" +
-        "                <span class=\"card__text\">" +
-        "                    " + data[video].quality +
-        "                </span>" +
-        "            </span>" +
-        "        </span>" +
-        "    </span>" +
-        "</span>" +
-        "</a>" +
-        "</div>";
-      console.log(data[video]);
-    }
+    insertVideos(data);
+    pagina[newPage] = data;
   });
+
+  $.getJSON('/api/?query=' + query + '&tipo=' + tipo + '&pagina=' + (newPage + 1), function (data) {
+    pagina[(newPage + 1)] = data;
+  });
+
+  paginaAtual = newPage;
+  updateUrl();
+}
+
+function updateUrl() {
+
+  const myUrlWithParams = new URL(document.URL);
+
+  if (query+"".length > 0)
+    myUrlWithParams.searchParams.append("query", query);
+
+  if(tipoAtual+"".length > 0)
+    myUrlWithParams.searchParams.append("tipo", tipoAtual);
+
+  if(paginaAtual != null && paginaAtual > 0)
+    myUrlWithParams.searchParams.append("pagina", paginaAtual);
+
+   window.history.pushState('', '', myUrlWithParams.href);
+}
+
+function insertVideos(data) {
+  paginaAtualJson = data;
+  document.getElementById("videoList").innerHTML = "";
+  for (var video in data) {
+    document.getElementById("videoList").innerHTML = document.getElementById("videoList").innerHTML + "<div class=\"cards__item js-item\"><a style=\"cursor:pointer\" onclick=\"location.href='video.html?id=" + data[video].videoId + "&t=" + data[video].title + "&v=" + data[video].views + "&d=" + data[video].duration + "'\" class=\"card js-link\"" +
+      "data-rt=\"25:831c7c7716c2633c91917029aa159d0d:0:13259:1:\">" +
+      "<span class=\"card__content\"" +
+      "    data-preview=\"" + data[video].preview + "\">" +
+      "    <span class=\"flag-group\">" +
+      "        <span class=\"flag\">" + data[video].duration + "</span>" +
+      "    </span>" +
+      "    <img class=\"card__img lazyload\"" +
+      "        src=\"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\"" +
+      "        data-src=\"" + data[video].thumbnail + "\"" +
+      "        data-webp=\"" + data[video].thumbnail + "\"" +
+      "        alt=\"" + data[video].title + "\"" +
+      "        width=\"320\" height=\"180\" />" +
+      "</span>" +
+      "<span class=\"card__footer\">" +
+      "    <span class=\"card__title\"" +
+      "        title=\"" + data[video].title + "\">" + data[video].title + "</span>" +
+      "    <span class=\"card__action\">" +
+      "        <span class=\"card__col\">" +
+      "            <span class=\"card__col\">" +
+      "                <span class=\"card__icon\">" +
+      "                    <svg class=\"icon icon--eye\">" +
+      "                        <use xlink:href=\"#eye\"></use>" +
+      "                    </svg>" +
+      "                </span>" +
+      "                <span class=\"card__text\">" + data[video].views + "</span>" +
+      "            </span>" +
+      "            <span class=\"card__col\">" +
+      "                <span class=\"card__text\">" +
+      "                    " + data[video].quality +
+      "                </span>" +
+      "            </span>" +
+      "        </span>" +
+      "    </span>" +
+      "</span>" +
+      "</a>" +
+      "</div>";
+  }
 }
 /**
  * --------------------------------------------------------------------------
@@ -461,7 +514,7 @@ var Collapse = function ($) {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+//function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
  * --------------------------------------------------------------------------
