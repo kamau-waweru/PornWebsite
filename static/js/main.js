@@ -17,8 +17,8 @@ function nextPage() {
   if (pagina[paginaAtual] != null) {
     insertVideos(pagina[paginaAtual]);
     if (pagina[(paginaAtual + 1)] == null) {
-      $.getJSON('/api/?query=' + query + '&tipo=' + tipo + '&pagina=' + (paginaAtual + 1), function (data) {
-        pagina[(paginaAtual + 1)] = data;
+      $.getJSON(`/api/?query=${query}&tipo=${tipo}&pagina=${parseInt(paginaAtual) + 1}`, function (data) {
+        pagina[parseInt(paginaAtual) + 1] = data;
       });
     }
   } else {
@@ -48,6 +48,12 @@ function returnPage() {
   else
     insertVideos(pagina[paginaAtual]);
 
+  if ((parseInt(paginaAtual) - 1) > -1) {
+    $.getJSON(`/api/?query=${query}&tipo=${tipo}&pagina=${parseInt(paginaAtual) - 1}`, function (data) {
+      pagina[parseInt(paginaAtual) - 1] = data;
+    });
+  }
+
   updateBotaoVoltar();
   updateUrl();
 }
@@ -55,10 +61,11 @@ function returnPage() {
 function loadVideosPage() {
   query = (new URLSearchParams(window.location.search).get('q') || null);
   tipo = (new URLSearchParams(window.location.search).get('tipo') || "portugues");
+  pagina2 = (new URLSearchParams(window.location.search).get('pagina') || 0);
   if (query != null) {
     loadPage("search", 0, query);
   } else {
-    loadPage(tipo);
+    loadPage(tipo, pagina2);
   }
 }
 
@@ -76,56 +83,46 @@ function loadVideoInfo() {
   document.getElementById("duracao").innerText = duracao;
   document.getElementById("visualizacoes").innerText = views;
   document.getElementById("share_link").value = window.location.href;
-
   document.getElementById("kt_player").src = "https://www.xvideos.com/embedframe/" + videoId;
 }
 
-function loadPhotos() {
-
-}
-
 function loadPage(tipo, newPage = 0, query = "") {
+  console.log("Load page...");
   document.getElementById("videoList").innerHTML = "<div class=\"loader\"></div>";
-  tipoAtual = tipo;
-  if (newPage < 0)
-    newPage = (new URLSearchParams(window.location.search).get('pagina') || null);
-
-  if (newPage < 1)
-    document.getElementById("botaovoltar").classList.add("is-disabled");
-  else
-    document.getElementById("botaovoltar").classList.remove("is-disabled");
-
-  $.getJSON('/api/?query=' + query + '&tipo=' + tipo + '&pagina=' + newPage, function (data) {
+  $.getJSON(`/api/?query=${query}&tipo=${tipo}&pagina=${newPage}`, function (data) {
     insertVideos(data);
     pagina[newPage] = data;
   });
-
-  $.getJSON('/api/?query=' + query + '&tipo=' + tipo + '&pagina=' + (newPage + 1), function (data) {
-    pagina[(newPage + 1)] = data;
+  $.getJSON(`/api/?query=${query}&tipo=${tipo}&pagina=${parseInt(newPage) + 1}`, function (data) {
+    pagina[parseInt(newPage) + 1] = data;
   });
-
+  if ((parseInt(newPage) - 1) > -1) {
+    $.getJSON(`/api/?query=${query}&tipo=${tipo}&pagina=${parseInt(newPage) - 1}`, function (data) {
+      pagina[parseInt(newPage) - 1] = data;
+    });
+  }
   paginaAtual = newPage;
-  updateUrl();
+  tipoAtual = tipo;
+  updateBotaoVoltar();
 }
 
 function updateUrl() {
 
-  const myUrlWithParams = new URL(document.URL);
+  const myUrlWithParams = new URL(window.location.href.split('?')[0]);
 
-  if (query+"".length > 0)
+  if (query + "".length > 0)
     myUrlWithParams.searchParams.append("query", query);
 
-  if(tipoAtual+"".length > 0)
+  if (tipoAtual + "".length > 0)
     myUrlWithParams.searchParams.append("tipo", tipoAtual);
 
-  if(paginaAtual != null && paginaAtual > 0)
+  if (paginaAtual != null && paginaAtual > 0)
     myUrlWithParams.searchParams.append("pagina", paginaAtual);
 
-   window.history.pushState('', '', myUrlWithParams.href);
+  window.history.pushState('', '', myUrlWithParams.href);
 }
 
 function insertVideos(data) {
-  paginaAtualJson = data;
   document.getElementById("videoList").innerHTML = "";
   for (var video in data) {
     document.getElementById("videoList").innerHTML = document.getElementById("videoList").innerHTML + "<div class=\"cards__item js-item\"><a style=\"cursor:pointer\" onclick=\"location.href='video.html?id=" + data[video].videoId + "&t=" + data[video].title + "&v=" + data[video].views + "&d=" + data[video].duration + "'\" class=\"card js-link\"" +
