@@ -6,5 +6,5 @@ Porn site based on its own api that obtains data through xvideos.
 - Xvideos - data source.
 
 # How use
-Just upload the files on yout host.
+Just upload the files on your host.
 - Vercel compatible!
